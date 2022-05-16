@@ -2,24 +2,24 @@ import './App.css';
 import { useState } from 'react';
 import { ethers } from 'ethers';
 import Greeter from './artifacts/contracts/Greeter.sol/Greeter.json';
+import Token from './artifacts/contracts/Token.sol/Token.json';
 
-// the exact address of the contract is a function of the external account
-// and the # of transactions it has sent
-const greeterAddress = "0xd412844eE6686aF223cd6581934A50C276f7AB5A";
+const greeterAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+const tokenAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
 
 function App() {
   const [greeting, setGreetingValue] = useState();
+  const [userAccount, setUserAccount] = useState();
+  const [amount, setAmount] = useState();
 
-  // request the current account from the metamask API
   async function requestAccount() {
     await window.ethereum.request({ method: 'eth_requestAccounts' });
   }
 
   async function fetchGreeting() {
-    // window.ethereum global variable is set by metamask
     if (typeof window.ethereum !== 'undefined') {
-      // the provider is responsible for communicating with ethereum network nodes
       const provider = new ethers.providers.Web3Provider(window.ethereum);
+      console.log({ provider })
       const contract = new ethers.Contract(greeterAddress, Greeter.abi, provider);
       try {
         const data = await contract.greet();
@@ -31,12 +31,12 @@ function App() {
   }
 
   async function setGreeting() {
-    if(!greeting) return;
-    if (typeof window.ethereum !== 'undefined') {
+    if (!greeting) return;
+    if( typeof window.ethereum !== 'undefined') {
       await requestAccount();
       const provider = new ethers.providers.Web3Provider(window.ethereum);
+      console.log({ provider });
       const signer = provider.getSigner();
-      // pass signature for transactions
       const contract = new ethers.Contract(greeterAddress, Greeter.abi, signer);
       const transaction = await contract.setGreeting(greeting);
       await transaction.wait();
@@ -44,41 +44,46 @@ function App() {
     }
   }
 
+  async function getBalance() {
+    if( typeof window.ethereum !== 'undefined') {
+      const [account] = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const contract = new ethers.Contract(tokenAddress, Token.abi, provider);
+      const balance = await contract.balanceOf(account);
+      console.log('Balance: ', balance.toString());
+    }
+  }
+
+  async function sendCoins() {
+    if (typeof window.ethereum != 'undefined') {
+      await requestAccount(); // what does this do if we don't use the return value?
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(tokenAddress, Token.abi, signer);
+      const transaction = await contract.transfer(userAccount, amount);
+      await transaction.wait();
+      const fromAddress = await signer.getAddress();
+      console.log(`${amount} Coins successfully sent to ${userAccount} from ${fromAddress}`);
+    }
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
+    <div className='App'>
+      <header className='App-header'>
         <button onClick={fetchGreeting}>Fetch Greeting</button>
         <button onClick={setGreeting}>Set Greeting</button>
-        <input onChange={e => setGreetingValue(e.target.value)} placeholder="Set greeting"/>
+        <input onChange={e => setGreetingValue(e.target.value)} placeholder="Set greeting" />
+
+        <br />
+
+        <button onClick={getBalance}>Get Balance</button>
+        <button onClick={sendCoins}>Send Coins</button>
+        <input onChange={e => setUserAccount(e.target.value)} placeholder="Account ID to transfer $$$ to" />
+        <input onChange={e => setAmount(e.target.value)} placeholder="Amount" />
+
       </header>
     </div>
   );
 }
 
 export default App;
-
-// import logo from './logo.svg';
-// import './App.css';
-
-// function App() {
-//   return (
-//     <div className="App">
-//       <header className="App-header">
-//         <img src={logo} className="App-logo" alt="logo" />
-//         <p>
-//           Edit <code>src/App.js</code> and save to reload.
-//         </p>
-//         <a
-//           className="App-link"
-//           href="https://reactjs.org"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           Learn React
-//         </a>
-//       </header>
-//     </div>
-//   );
-// }
-
-// export default App;

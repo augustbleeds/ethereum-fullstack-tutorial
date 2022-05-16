@@ -14,6 +14,9 @@ async function main() {
   const Token = await hre.ethers.getContractFactory('Token');
   const token = await Token.deploy();
 
+  const ERC20Token = await hre.ethers.getContractFactory('ERC20Token');
+  const erc20Token = await ERC20Token.deploy("Seraphim Token", "ANG");
+
   await greeter.deployed();
   await token.deployed();
 

@@ -1,3 +1,7 @@
+# Notes
+The main branch includes the code for local hardhat network deployment. The ropsten branch is just for the part of the assignment (greeting section) which was deployed on the Ropsten network. 
+
+
 # Basic Sample Hardhat Project
 
 This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.

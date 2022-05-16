@@ -5,7 +5,7 @@ import Greeter from './artifacts/contracts/Greeter.sol/Greeter.json';
 
 // the exact address of the contract is a function of the external account
 // and the # of transactions it has sent
-const greeterAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+const greeterAddress = "0xd412844eE6686aF223cd6581934A50C276f7AB5A";
 
 function App() {
   const [greeting, setGreetingValue] = useState();
